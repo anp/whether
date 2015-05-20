@@ -19,7 +19,7 @@ repositories {
 
 dependencies {
     compile(
-
+            'commons-configuration:commons-configuration:1.10'
     )
     testCompile(
             'junit:junit:4.11',
@@ -44,5 +44,5 @@ def execJarPath = libsDir.getCanonicalPath() + File.separator + artifactName
 
 task runProcessor(type: Exec, dependsOn: capsule) {
     //MAKE SURE CONFIG PATH IS CORRECT
-    commandLine('java', '-jar', execJarPath)
+    commandLine('java', '-jar', execJarPath, 'whether.properties')
 }
