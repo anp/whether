@@ -1,1 +1,4 @@
 gsodFolderPath = #path to ~/gsod
+
+stationInventoryFilename = isd-history.txt
+unpackedFolderPath = unzipped

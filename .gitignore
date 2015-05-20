@@ -1,4 +1,4 @@
-whether.properties
+*.properties
 
 # Created by .ignore support plugin (hsz.mobi)
 
@@ -159,8 +159,6 @@ gradle-app.setting
 !gradle-wrapper.jar
 
 
-### Java template
-*.class
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/

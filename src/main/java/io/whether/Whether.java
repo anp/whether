@@ -12,9 +12,16 @@ class Whether {
         try {
             Configuration config = new PropertiesConfiguration(args[0]);
 
-            File stationDataFile = new File((String) config.getProperty("gsodFolderPath") + File.separatorChar + "isd-history.txt");
+            String gsodPath = (String) config.getProperty("gsodFolderPath");
+
+            String inventoryFilename = (String) config.getProperty("stationInventoryFilename");
+            File stationDataFile = new File(gsodPath + File.separatorChar + inventoryFilename);
             StationDataParser parser = new StationDataParser(stationDataFile);
             parser.parse();
+
+            String unpackedFolderName = (String) config.getProperty("unpackedFolderPath");
+            File gsodUnpackedFolder = new File(gsodPath + File.separatorChar + unpackedFolderName);
+
         } catch (ConfigurationException ce) {
             //TODO log error
         }
