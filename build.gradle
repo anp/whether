@@ -1,0 +1,48 @@
+plugins {
+    id 'java'
+    id 'application'
+    id "us.kirchmeier.capsule" version "1.0-rc1"
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+version = '1.0'
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+//fill this out and uncomment
+mainClassName = 'io.whether.Whether'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile(
+
+    )
+    testCompile(
+            'junit:junit:4.11',
+            'org.mockito:mockito-core:2.+'
+    )
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.4'
+}
+
+task capsule(type: FatCapsule) {
+    applicationClass mainClassName
+
+    capsuleManifest {
+        minJavaVersion = '1.8.0'
+    }
+}
+
+def artifactName = 'whether-' + version + '-capsule.jar'
+def execJarPath = libsDir.getCanonicalPath() + File.separator + artifactName
+
+task runProcessor(type: Exec, dependsOn: capsule) {
+    //MAKE SURE CONFIG PATH IS CORRECT
+    commandLine('java', '-jar', execJarPath)
+}

@@ -21,17 +21,5 @@ do
 	zcat $GZIP_FILE > ~/gsod/unzipped/$(basename "${GZIP_FILE}" .gz)
 done
 
-cd ~/gsod/
 rm -dr ~/gsod/untarred
 
-echo "Seeding merge process..."
-for OP_FILE_INIT in `ls -1 ~/gsod/unzipped/*-1973.op`
-do
-	mv $OP_FILE_INIT ~/gsod/merged/${$OP_FILE_INIT#'-1973'}
-done
-
-echo "Merging files..."
-
-echo "Nothing happening here yet..."
-
-echo "Done merging!"
