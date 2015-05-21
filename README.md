@@ -1,9 +1,12 @@
 # whether
 Data pipeline and visualization tool for public weather data.
 
-To download, unpack and merge all of the NCDC GSOD data files in preparation for processing:
+To download and unpack all of the NCDC GSOD data files in preparation for processing:
 ```
 ./main.sh
 ```
-
-This will (in future repo updates) also process the files and output the visualizations.
+To run the processor manually:
+```
+gradle clean runProcessor
+```
+In the near future, the Dockerfile will be functional and the entire process will run inside a purpose-built docker image.
