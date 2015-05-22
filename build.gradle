@@ -19,7 +19,10 @@ repositories {
 
 dependencies {
     compile(
-            'commons-configuration:commons-configuration:1.10'
+            'commons-configuration:commons-configuration:1.10',
+            'org.apache.logging.log4j:log4j-core:2.3',
+            'org.apache.logging.log4j:log4j-api:2.3',
+            'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.5.0'
     )
     testCompile(
             'junit:junit:4.11',

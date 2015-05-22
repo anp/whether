@@ -1,32 +1,33 @@
 package io.whether;
 
 import io.whether.domain.Station;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class StationDataParser {
-    public static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+    private static final Logger log = LogManager.getLogger(StationDataParser.class);
 
     List<Station> stations;
     File stationDataFile;
 
     public StationDataParser(File inFile) {
         stationDataFile = inFile;
-        stations = new ArrayList<>();
+        stations = new CopyOnWriteArrayList<>();
     }
 
     public boolean parse() {
         try {
             BufferedReader rdr = new BufferedReader(new FileReader(stationDataFile));
 
-            //read through until
+            //read through until we're past the file header
             while (!rdr.readLine().startsWith("USAF")) ;
 
             String line = rdr.readLine();
@@ -41,35 +42,33 @@ public class StationDataParser {
                 String latStr = line.substring(57, 65).trim();
                 String longStr = line.substring(65, 74).trim();
                 String elevStr = line.substring(74, 82).trim();
-                String periodBegin = line.substring(82, 91).trim();
-                String periodEnd = line.substring(91).trim();
 
-                //data will be reported geographically, no need to include stations that are missing this info
-                if (latStr.length() == 0 || longStr.length() == 0 || elevStr.length() == 0) continue;
+                try {
+                    int usafID = Integer.parseInt(usafStr);
+                    int wbanID = Integer.parseInt(wbanStr);
 
-                int usafID = Integer.parseInt(usafStr);
-                int wbanID = Integer.parseInt(wbanStr);
+                    float latitude = Float.parseFloat(latStr);
+                    float longitude = Float.parseFloat(longStr);
+                    float elevation = Float.parseFloat(elevStr);
 
-                float latitude = Float.parseFloat(latStr);
-                float longitude = Float.parseFloat(longStr);
-                float elevation = Float.parseFloat(elevStr);
+                    Station currentStation = new Station(usafID, wbanID, latitude, longitude, elevation);
 
-                LocalDate periodBeginDate = LocalDate.parse(periodBegin, dateFormatter);
-                LocalDate periodEndDate = LocalDate.parse(periodEnd, dateFormatter);
+                    currentStation.setStationName(stationName);
+                    currentStation.setCountryID(fips);
+                    currentStation.setState(state);
+                    currentStation.setIcaoID(icao);
 
-                Station currentStation = new Station(usafID, wbanID, latitude, longitude, elevation, periodBeginDate, periodEndDate);
+                    stations.add(currentStation);
+                } catch (NumberFormatException nfe) {
+                    //we want to ignore any stations that have letters in their IDs -- the GSOD data doesn't cover them
+                }
 
-                currentStation.setStationName(stationName);
-                currentStation.setCountryID(fips);
-                currentStation.setState(state);
-                currentStation.setIcaoID(icao);
-
-                System.out.println(currentStation.toString());
             }
 
 
         } catch (IOException ioe) {
-            //TODO add logging
+            log.error("IO error when reading station data file " + stationDataFile.getAbsolutePath(), ioe);
+            return false;
         }
         return true;
     }

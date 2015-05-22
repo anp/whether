@@ -1,7 +1,5 @@
 package io.whether.domain;
 
-import java.time.LocalDate;
-
 public class Station {
     int usafID;
     int wbanID;
@@ -15,24 +13,17 @@ public class Station {
     float longitude;
     float elevation;
 
-    LocalDate recordPeriodBegin;
-    LocalDate recordPeriodEnd;
-
-    public Station(int usafID, int wbanID, LocalDate recordPeriodBegin, LocalDate recordPeriodEnd) {
+    public Station(int usafID, int wbanID) {
         this.usafID = usafID;
         this.wbanID = wbanID;
-        this.recordPeriodBegin = recordPeriodBegin;
-        this.recordPeriodEnd = recordPeriodEnd;
     }
 
-    public Station(int usafID, int wbanID, float latitude, float longitude, float elevation, LocalDate recordPeriodBegin, LocalDate recordPeriodEnd) {
+    public Station(int usafID, int wbanID, float latitude, float longitude, float elevation) {
         this.usafID = usafID;
         this.wbanID = wbanID;
         this.latitude = latitude;
         this.longitude = longitude;
         this.elevation = elevation;
-        this.recordPeriodBegin = recordPeriodBegin;
-        this.recordPeriodEnd = recordPeriodEnd;
     }
 
     public int getUsafID() {
@@ -107,22 +98,6 @@ public class Station {
         this.elevation = elevation;
     }
 
-    public LocalDate getRecordPeriodBegin() {
-        return recordPeriodBegin;
-    }
-
-    public void setRecordPeriodBegin(LocalDate recordPeriodBegin) {
-        this.recordPeriodBegin = recordPeriodBegin;
-    }
-
-    public LocalDate getRecordPeriodEnd() {
-        return recordPeriodEnd;
-    }
-
-    public void setRecordPeriodEnd(LocalDate recordPeriodEnd) {
-        this.recordPeriodEnd = recordPeriodEnd;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -153,8 +128,6 @@ public class Station {
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", elevation=" + elevation +
-                ", recordPeriodBegin=" + recordPeriodBegin +
-                ", recordPeriodEnd=" + recordPeriodEnd +
                 '}';
     }
 }

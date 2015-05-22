@@ -10,6 +10,4 @@
 
 #cleanup
 
-./download.sh
-
-./unpack.sh
+time sh -c './download.sh && ./unpack.sh && gradle clean runProcessor'
