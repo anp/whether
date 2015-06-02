@@ -3,311 +3,305 @@ package io.whether.domain;
 import java.time.LocalDate;
 
 public class DailySummary {
-    Station station;
-    LocalDate date;
+	Station station;
+	LocalDate date;
 
-    Double meanTemperatureFahrenheit;
-    int numMeanTempObservations;
+	Double meanTemperatureFahrenheit;
+	int numMeanTempObservations;
 
-    Double dewPointFahrenheit;
-    int numDewPointObservations;
+	Double dewPointFahrenheit;
+	int numDewPointObservations;
 
-    Double seaLevelPressureMillibars;
-    int numSeaLevelPressureObservations;
+	Double seaLevelPressureMillibars;
+	int numSeaLevelPressureObservations;
 
-    Double stationPressureMillibars;
-    int numStationPressureObservations;
+	Double stationPressureMillibars;
+	int numStationPressureObservations;
 
-    Double visibilityMiles;
-    int numVisibilityObservations;
+	Double visibilityMiles;
+	int numVisibilityObservations;
 
-    Double meanWindSpeedKnots;
-    int numMeanWindSpeedObservations;
+	Double meanWindSpeedKnots;
+	int numMeanWindSpeedObservations;
 
-    Double maxWindSpeedKnots;
-    int numMaxWindSpeedObservations;
+	Double maxWindSpeedKnots;
 
-    Double maxWindGustKnots;
+	Double maxWindGustKnots;
 
-    Double maxTemperatureFahrenheit;
-    boolean maxTempIsFromHourlyData;
+	Double maxTemperatureFahrenheit;
+	boolean maxTempIsFromHourlyData;
 
-    Double minTemperatureFahrenheit;
-    boolean minTempIsFromHourlyData;
+	Double minTemperatureFahrenheit;
+	boolean minTempIsFromHourlyData;
 
-    Double precipitationInches;
-    String precipReportFlag;
+	Double precipitationInches;
+	String precipReportFlag;
 
-    Double snowDepth;
+	Double snowDepth;
 
-    boolean fogReported;
-    boolean rainOrDrizzleReported;
-    boolean snowOrIcePelletsReported;
-    boolean hailReported;
-    boolean thunderReported;
-    boolean tornadoReported;
+	boolean fogReported;
+	boolean rainOrDrizzleReported;
+	boolean snowOrIcePelletsReported;
+	boolean hailReported;
+	boolean thunderReported;
+	boolean tornadoReported;
 
-    public DailySummary(Station station, LocalDate date) {
-        this.station = station;
-        this.date = date;
-    }
+	public DailySummary(Station newStation, LocalDate newDate) {
+		station = newStation;
+		date = newDate;
+	}
 
-    public Station getStation() {
-        return station;
-    }
+	public Station getStation() {
+		return station;
+	}
 
-    public LocalDate getDate() {
-        return date;
-    }
+	public LocalDate getDate() {
+		return date;
+	}
 
-    public Double getMeanTemperatureFahrenheit() {
-        return meanTemperatureFahrenheit;
-    }
+	public Double getMeanTemperatureFahrenheit() {
+		return meanTemperatureFahrenheit;
+	}
 
-    public void setMeanTemperatureFahrenheit(Double meanTemperatureFahrenheit, int numMeanTempObservations) {
-        this.meanTemperatureFahrenheit = meanTemperatureFahrenheit;
-        this.numMeanTempObservations = numMeanTempObservations;
-    }
+	public void setMeanTemperatureFahrenheit(final Double meanTempFahr, final int numObs) {
+		meanTemperatureFahrenheit = meanTempFahr;
+		numMeanTempObservations = numObs;
+	}
 
-    public int getNumMeanTempObservations() {
-        return numMeanTempObservations;
-    }
+	public int getNumMeanTempObservations() {
+		return numMeanTempObservations;
+	}
 
-    public Double getDewPointFahrenheit() {
-        return dewPointFahrenheit;
-    }
+	public Double getDewPointFahrenheit() {
+		return dewPointFahrenheit;
+	}
 
-    public void setDewPointFahrenheit(Double dewPointFahrenheit, int numDewPointObservations) {
-        this.dewPointFahrenheit = dewPointFahrenheit;
-        this.numDewPointObservations = numDewPointObservations;
-    }
+	public void setDewPointFahrenheit(Double dewPointFahr, int numObs) {
+		dewPointFahrenheit = dewPointFahr;
+		numDewPointObservations = numObs;
+	}
 
-    public int getNumDewPointObservations() {
-        return numDewPointObservations;
-    }
+	public int getNumDewPointObservations() {
+		return numDewPointObservations;
+	}
 
-    public Double getSeaLevelPressureMillibars() {
-        return seaLevelPressureMillibars;
-    }
+	public Double getSeaLevelPressureMillibars() {
+		return seaLevelPressureMillibars;
+	}
 
-    public void setSeaLevelPressureMillibars(Double seaLevelPressureMillibars, int numSeaLevelPressureObservations) {
-        this.seaLevelPressureMillibars = seaLevelPressureMillibars;
-        this.numSeaLevelPressureObservations = numSeaLevelPressureObservations;
-    }
+	public void setSeaLevelPressureMillibars(Double seaLevelPressMillibar, int numObs) {
+		seaLevelPressureMillibars = seaLevelPressMillibar;
+		numSeaLevelPressureObservations = numObs;
+	}
 
-    public int getNumSeaLevelPressureObservations() {
-        return numSeaLevelPressureObservations;
-    }
+	public int getNumSeaLevelPressureObservations() {
+		return numSeaLevelPressureObservations;
+	}
 
-    public Double getStationPressureMillibars() {
-        return stationPressureMillibars;
-    }
+	public Double getStationPressureMillibars() {
+		return stationPressureMillibars;
+	}
 
-    public void setStationPressureMillibars(Double stationPressureMillibars, int numStationPressureObservations) {
-        this.stationPressureMillibars = stationPressureMillibars;
-        this.numStationPressureObservations = numStationPressureObservations;
-    }
-
-    public int getNumStationPressureObservations() {
-        return numStationPressureObservations;
-    }
-
-    public Double getVisibilityMiles() {
-        return visibilityMiles;
-    }
-
-    public void setVisibilityMiles(Double visibilityMiles, int numVisibilityObservations) {
-        this.visibilityMiles = visibilityMiles;
-        this.numVisibilityObservations = numVisibilityObservations;
-    }
-
-    public int getNumVisibilityObservations() {
-        return numVisibilityObservations;
-    }
-
-    public Double getMeanWindSpeedKnots() {
-        return meanWindSpeedKnots;
-    }
-
-    public void setMeanWindSpeedKnots(Double meanWindSpeedKnots, int numMeanWindSpeedObservations) {
-        this.meanWindSpeedKnots = meanWindSpeedKnots;
-        this.numMeanWindSpeedObservations = numMeanWindSpeedObservations;
-    }
-
-    public int getNumMeanWindSpeedObservations() {
-        return numMeanWindSpeedObservations;
-    }
-
-    public Double getMaxWindSpeedKnots() {
-        return maxWindSpeedKnots;
-    }
-
-    public void setMaxWindSpeedKnots(Double maxWindSpeedKnots) {
-        this.maxWindSpeedKnots = maxWindSpeedKnots;
-    }
-
-    public int getNumMaxWindSpeedObservations() {
-        return numMaxWindSpeedObservations;
-    }
-
-    public void setNumMaxWindSpeedObservations(int numMaxWindSpeedObservations) {
-        this.numMaxWindSpeedObservations = numMaxWindSpeedObservations;
-    }
-
-    public Double getMaxWindGustKnots() {
-        return maxWindGustKnots;
-    }
-
-    public void setMaxWindGustKnots(Double maxWindGustKnots) {
-        this.maxWindGustKnots = maxWindGustKnots;
-    }
-
-    public Double getMaxTemperatureFahrenheit() {
-        return maxTemperatureFahrenheit;
-    }
-
-    public void setMaxTemperatureFahrenheit(Double maxTemperatureFahrenheit, boolean maxTempIsFromHourlyData) {
-        this.maxTemperatureFahrenheit = maxTemperatureFahrenheit;
-        this.maxTempIsFromHourlyData = maxTempIsFromHourlyData;
-    }
-
-    public boolean isMaxTempIsFromHourlyData() {
-        return maxTempIsFromHourlyData;
-    }
-
-    public Double getMinTemperatureFahrenheit() {
-        return minTemperatureFahrenheit;
-    }
-
-    public void setMinTemperatureFahrenheit(Double minTemperatureFahrenheit, boolean minTempIsFromHourlyData) {
-        this.minTemperatureFahrenheit = minTemperatureFahrenheit;
-        this.minTempIsFromHourlyData = minTempIsFromHourlyData;
-    }
-
-    public boolean isMinTempIsFromHourlyData() {
-        return minTempIsFromHourlyData;
-    }
-
-    public Double getPrecipitationInches() {
-        return precipitationInches;
-    }
-
-    public void setPrecipitationInches(Double precipitationInches, String precipReportFlag) {
-        this.precipitationInches = precipitationInches;
-        this.precipReportFlag = precipReportFlag;
-    }
-
-    public String getPrecipReportFlag() {
-        return precipReportFlag;
-    }
-
-    public Double getSnowDepth() {
-        return snowDepth;
-    }
-
-    public void setSnowDepth(Double snowDepth) {
-        this.snowDepth = snowDepth;
-    }
-
-    public boolean isFogReported() {
-        return fogReported;
-    }
-
-    public void setFogReported(boolean fogReported) {
-        this.fogReported = fogReported;
-    }
-
-    public boolean isRainOrDrizzleReported() {
-        return rainOrDrizzleReported;
-    }
-
-    public void setRainOrDrizzleReported(boolean rainOrDrizzleReported) {
-        this.rainOrDrizzleReported = rainOrDrizzleReported;
-    }
-
-    public boolean isSnowOrIcePelletsReported() {
-        return snowOrIcePelletsReported;
-    }
-
-    public void setSnowOrIcePelletsReported(boolean snowOrIcePelletsReported) {
-        this.snowOrIcePelletsReported = snowOrIcePelletsReported;
-    }
-
-    public boolean isHailReported() {
-        return hailReported;
-    }
-
-    public void setHailReported(boolean hailReported) {
-        this.hailReported = hailReported;
-    }
-
-    public boolean isThunderReported() {
-        return thunderReported;
-    }
-
-    public void setThunderReported(boolean thunderReported) {
-        this.thunderReported = thunderReported;
-    }
-
-    public boolean isTornadoReported() {
-        return tornadoReported;
-    }
-
-    public void setTornadoReported(boolean tornadoReported) {
-        this.tornadoReported = tornadoReported;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        DailySummary that = (DailySummary) o;
-
-        return station.equals(that.station) && date.equals(that.date);
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = station.hashCode();
-        result = 31 * result + date.hashCode();
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "DailySummary{" +
-                "station = " + station +
-                ",\n date = " + date +
-                ",\t meanTemperatureFahrenheit = " + meanTemperatureFahrenheit +
-                ",\t numMeanTempObservations = " + numMeanTempObservations +
-                ",\t dewPointFahrenheit = " + dewPointFahrenheit +
-                ",\t numDewPointObservations = " + numDewPointObservations +
-                ",\t seaLevelPressureMillibars = " + seaLevelPressureMillibars +
-                ",\t numSeaLevelPressureObservations = " + numSeaLevelPressureObservations +
-                ",\t stationPressureMillibars = " + stationPressureMillibars +
-                ",\t numStationPressureObservations = " + numStationPressureObservations +
-                ",\t visibilityMiles = " + visibilityMiles +
-                ",\t numVisibilityObservations = " + numVisibilityObservations +
-                ",\t meanWindSpeedKnots = " + meanWindSpeedKnots +
-                ",\t numMeanWindSpeedObservations = " + numMeanWindSpeedObservations +
-                ",\t maxWindSpeedKnots = " + maxWindSpeedKnots +
-                ",\t numMaxWindSpeedObservations = " + numMaxWindSpeedObservations +
-                ",\t maxWindGustKnots = " + maxWindGustKnots +
-                ",\t maxTemperatureFahrenheit = " + maxTemperatureFahrenheit +
-                ",\t maxTempIsFromHourlyData = " + maxTempIsFromHourlyData +
-                ",\t minTemperatureFahrenheit = " + minTemperatureFahrenheit +
-                ",\t minTempIsFromHourlyData = " + minTempIsFromHourlyData +
-                ",\t precipitationInches = " + precipitationInches +
-                ",\t precipReportFlag = " + precipReportFlag +
-                ",\t snowDepth = " + snowDepth +
-                ",\t fogReported = " + fogReported +
-                ",\t rainOrDrizzleReported = " + rainOrDrizzleReported +
-                ",\t snowOrIcePelletsReported = " + snowOrIcePelletsReported +
-                ",\t hailReported = " + hailReported +
-                ",\t thunderReported = " + thunderReported +
-                ",\t tornadoReported = " + tornadoReported +
-                "}\n\n";
-    }
+	public void setStationPressureMillibars(Double stationPressMillibar, int numObs) {
+		stationPressureMillibars = stationPressMillibar;
+		numStationPressureObservations = numObs;
+	}
+
+	public int getNumStationPressureObservations() {
+		return numStationPressureObservations;
+	}
+
+	public Double getVisibilityMiles() {
+		return visibilityMiles;
+	}
+
+	public void setVisibilityMiles(Double visibilityInMiles, int numObs) {
+		visibilityMiles = visibilityInMiles;
+		numVisibilityObservations = numObs;
+	}
+
+	public int getNumVisibilityObservations() {
+		return numVisibilityObservations;
+	}
+
+	public Double getMeanWindSpeedKnots() {
+		return meanWindSpeedKnots;
+	}
+
+	public void setMeanWindSpeedKnots(Double meanWindSpeed, int numObs) {
+		meanWindSpeedKnots = meanWindSpeed;
+		numMeanWindSpeedObservations = numObs;
+	}
+
+	public int getNumMeanWindSpeedObservations() {
+		return numMeanWindSpeedObservations;
+	}
+
+	public Double getMaxWindSpeedKnots() {
+		return maxWindSpeedKnots;
+	}
+
+	public void setMaxWindSpeedKnots(Double maxWindSpeed) {
+		maxWindSpeedKnots = maxWindSpeed;
+	}
+
+	public Double getMaxWindGustKnots() {
+		return maxWindGustKnots;
+	}
+
+	public void setMaxWindGustKnots(Double maxWindGust) {
+		this.maxWindGustKnots = maxWindGust;
+	}
+
+	public Double getMaxTemperatureFahrenheit() {
+		return maxTemperatureFahrenheit;
+	}
+
+	public void setMaxTemperatureFahrenheit(Double maxTempFahr, boolean isFromHourlyData) {
+		this.maxTemperatureFahrenheit = maxTempFahr;
+		this.maxTempIsFromHourlyData = isFromHourlyData;
+	}
+
+	public boolean isMaxTempIsFromHourlyData() {
+		return maxTempIsFromHourlyData;
+	}
+
+	public Double getMinTemperatureFahrenheit() {
+		return minTemperatureFahrenheit;
+	}
+
+	public void setMinTemperatureFahrenheit(Double minTempFahr, boolean isFromHourlyData) {
+		this.minTemperatureFahrenheit = minTempFahr;
+		this.minTempIsFromHourlyData = isFromHourlyData;
+	}
+
+	public boolean isMinTempIsFromHourlyData() {
+		return minTempIsFromHourlyData;
+	}
+
+	public Double getPrecipitationInches() {
+		return precipitationInches;
+	}
+
+	public void setPrecipitationInches(Double precipInches, String reportFlag) {
+		precipitationInches = precipInches;
+		precipReportFlag = reportFlag;
+	}
+
+	public String getPrecipReportFlag() {
+		return precipReportFlag;
+	}
+
+	public Double getSnowDepth() {
+		return snowDepth;
+	}
+
+	public void setSnowDepth(Double snowDepthInches) {
+		snowDepth = snowDepthInches;
+	}
+
+	public boolean isFogReported() {
+		return fogReported;
+	}
+
+	public void setFogReported(boolean reported) {
+		this.fogReported = reported;
+	}
+
+	public boolean isRainOrDrizzleReported() {
+		return rainOrDrizzleReported;
+	}
+
+	public void setRainOrDrizzleReported(boolean reported) {
+		this.rainOrDrizzleReported = reported;
+	}
+
+	public boolean isSnowOrIcePelletsReported() {
+		return snowOrIcePelletsReported;
+	}
+
+	public void setSnowOrIcePelletsReported(boolean reported) {
+		this.snowOrIcePelletsReported = reported;
+	}
+
+	public boolean isHailReported() {
+		return hailReported;
+	}
+
+	public void setHailReported(boolean reported) {
+		this.hailReported = reported;
+	}
+
+	public boolean isThunderReported() {
+		return thunderReported;
+	}
+
+	public void setThunderReported(boolean reported) {
+		this.thunderReported = reported;
+	}
+
+	public boolean isTornadoReported() {
+		return tornadoReported;
+	}
+
+	public void setTornadoReported(boolean reported) {
+		this.tornadoReported = reported;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+
+		DailySummary that = (DailySummary) o;
+
+		return station.equals(that.station) && date.equals(that.date);
+
+	}
+
+	@Override
+	public int hashCode() {
+		int result = station.hashCode();
+		result = 31 * result + date.hashCode();
+		return result;
+	}
+
+	@Override
+	public String toString() {
+		return "DailySummary{" +
+				"station = " + station +
+				",\n date = " + date +
+				",\t meanTemperatureFahrenheit = " + meanTemperatureFahrenheit +
+				",\t numMeanTempObservations = " + numMeanTempObservations +
+				",\t dewPointFahrenheit = " + dewPointFahrenheit +
+				",\t numDewPointObservations = " + numDewPointObservations +
+				",\t seaLevelPressureMillibars = " + seaLevelPressureMillibars +
+				",\t numSeaLevelPressureObservations = " + numSeaLevelPressureObservations +
+				",\t stationPressureMillibars = " + stationPressureMillibars +
+				",\t numStationPressureObservations = " + numStationPressureObservations +
+				",\t visibilityMiles = " + visibilityMiles +
+				",\t numVisibilityObservations = " + numVisibilityObservations +
+				",\t meanWindSpeedKnots = " + meanWindSpeedKnots +
+				",\t numMeanWindSpeedObservations = " + numMeanWindSpeedObservations +
+				",\t maxWindSpeedKnots = " + maxWindSpeedKnots +
+				",\t maxWindGustKnots = " + maxWindGustKnots +
+				",\t maxTemperatureFahrenheit = " + maxTemperatureFahrenheit +
+				",\t maxTempIsFromHourlyData = " + maxTempIsFromHourlyData +
+				",\t minTemperatureFahrenheit = " + minTemperatureFahrenheit +
+				",\t minTempIsFromHourlyData = " + minTempIsFromHourlyData +
+				",\t precipitationInches = " + precipitationInches +
+				",\t precipReportFlag = " + precipReportFlag +
+				",\t snowDepth = " + snowDepth +
+				",\t fogReported = " + fogReported +
+				",\t rainOrDrizzleReported = " + rainOrDrizzleReported +
+				",\t snowOrIcePelletsReported = " + snowOrIcePelletsReported +
+				",\t hailReported = " + hailReported +
+				",\t thunderReported = " + thunderReported +
+				",\t tornadoReported = " + tornadoReported +
+				"}\n\n";
+	}
 }

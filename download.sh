@@ -2,9 +2,6 @@
 
 #This script downloads all NCDC GSOD data to ./gsod/
 
-#fail on error and report error of failing command
-set -e
-
 #make an output DIR
 mkdir -p ~/gsod
 
@@ -21,5 +18,7 @@ echo "Downloading GSOD annual tarballs from NCDC..."
 
 for YEAR in `seq 1973 2014`
 do
-	wget -nv -O ~/gsod/gsod_${YEAR}.tar ftp://ftp.ncdc.noaa.gov/pub/data/gsod/${YEAR}/gsod_${YEAR}.tar
+	if [ ! -f ~/gsod/gsod_${YEAR}.tar ]; then
+		wget -nv -O ~/gsod/gsod_${YEAR}.tar ftp://ftp.ncdc.noaa.gov/pub/data/gsod/${YEAR}/gsod_${YEAR}.tar
+	fi
 done

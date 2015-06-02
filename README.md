@@ -1,13 +1,14 @@
 # whether
 Data pipeline and visualization tool for public weather data.
 
+*NOTE: NCDC GSOD data is not currently approved for use outside of US.*
 
 To download, unpack and parse all of the NCDC GSOD data files in preparation for processing:
 ```
 ./main.sh
 ```
 
-This will (in future repo updates) also insert database records and create visualizations of the data.
+This will (in future repo updates) also create visualizations of the data.
 
 Here's the current output of the process running on a MacBook Pro with storage on a Samsung T1 USB SSD:
 

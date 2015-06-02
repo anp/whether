@@ -2,3 +2,9 @@ gsodFolderPath = #path to ~/gsod
 
 stationInventoryFilename = isd-history.txt
 unpackedFolderPath = unzipped
+
+postgresAddress = localhost
+postgresPort = 5432
+postgresDBName = whether
+postgresUser = postgres
+postgresPass = password
