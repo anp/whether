@@ -15,18 +15,17 @@ import org.skife.jdbi.v2.exceptions.DBIException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class Whether {
+public class Processor {
 
-	private static List<Station> stations;
-	private static Logger log = LogManager.getLogger(Whether.class);
+	private static final int N_THREADS = Runtime.getRuntime().availableProcessors();
+	private static Map<String, Station> stationLookup;
+	private static Logger log = LogManager.getLogger(Processor.class);
 
 	private static int filesProcessed = 0;
 	private static int numGsodFiles = 0;
@@ -42,12 +41,11 @@ public class Whether {
 			ds.setDatabaseName(config.getString("postgresDBName", "whether"));
 			ds.setUser(config.getString("postgresUser", "postgres"));
 			ds.setPassword(config.getString("postgresPass"));
-			ds.setMaxConnections(Runtime.getRuntime().availableProcessors());
+			ds.setMaxConnections(N_THREADS);
 
 			DBI dbi = new DBI(ds);
 
 			String gsodPath = config.getString("gsodFolderPath");
-
 			String inventoryFilename = config.getString("stationInventoryFilename");
 
 			try {
@@ -66,8 +64,15 @@ public class Whether {
 				StationDataParser parser = new StationDataParser(stationDataFile);
 				parser.parse();
 
-				stations = parser.getStations();
-				log.info("Station data parsed for " + stations.size() + " stations. Inserting station data into database...");
+				stationLookup = new HashMap<>();
+
+				for (Station station : parser.getStations()) {
+					stationLookup.put(station.getStationID() + "|" + station.getWbanID(), station);
+				}
+
+				stationLookup.putAll(parser.getDuplicateReplacements());
+
+				log.info("Station data parsed for " + stationLookup.size() + " stations. Inserting station data into database...");
 
 				parser.getStations().forEach(s -> {
 					try {
@@ -85,7 +90,6 @@ public class Whether {
 					}
 				});
 				log.info("Station data successfully persisted to database.");
-				dao.close();
 
 				String unpackedFolderName = config.getString("unpackedFolderPath");
 				File gsodUnpackedFolder = new File(gsodPath + File.separatorChar + unpackedFolderName);
@@ -100,17 +104,31 @@ public class Whether {
 
 				log.info(files.size() + " GSOD files found.");
 				numGsodFiles = files.size();
-				ExecutorService execService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+				ExecutorService execService = Executors.newFixedThreadPool(N_THREADS);
 
-				for (File f : files) {
+				int partitionSize = files.size() / N_THREADS;
+				for (int n = 0; n < N_THREADS; n++) {
+					int startIndex = partitionSize * n;
+
+					int calculatedEndIndex = partitionSize * (n + 1);
+					int endIndex = ((numGsodFiles - calculatedEndIndex) < partitionSize
+							|| calculatedEndIndex > numGsodFiles)
+							? numGsodFiles : calculatedEndIndex;
+
+					log.info("Sublist boundaries for worker thread " + n + ": " + startIndex + "-" + endIndex + " / " + numGsodFiles);
+
 					execService.submit(() -> {
 						DatabasePersister persister = dbi.open(DatabasePersister.class);
-						GSODParser currParser = new GSODParser(f);
-						currParser.parse();
-						persister.insertSummaryRecord(currParser.getSummaries());
+						for (File f : files.subList(startIndex, endIndex)) {
+
+							GSODParser currParser = new GSODParser(f);
+							currParser.parse();
+							persister.insertSummaryRecord(currParser.getSummaries());
+							tickParsingStatus();
+						}
 						persister.close();
-						tickParsingStatus();
 					});
+
 				}
 
 				try {
@@ -124,10 +142,13 @@ public class Whether {
 					log.info("Parsed all files. Creating summary index...");
 					dao.createSummaryIndex();
 					log.info("Successfully indexed all daily summaries.");
+					dao.cleanUp();
+					log.info("Successfully compacted and analyzed database.");
 				} catch (DBIException dbie) {
 					log.error("Problem creating summary index. " + dbie.getMessage());
 				}
 
+				dao.close();
 			} catch (IOException ioe) {
 				log.error(ioe);
 			}
@@ -144,11 +165,9 @@ public class Whether {
 	public static Optional<Station> getStation(int stationNumber, int wbanID) {
 		Optional<Station> returned = Optional.empty();
 
-		for (Station s : stations) {
-			if (s.getStationID() == stationNumber && s.getWbanID() == wbanID) {
-				returned = Optional.of(s);
-				break;
-			}
+		String key = stationNumber + "|" + wbanID;
+		if (stationLookup.containsKey(key)) {
+			returned = Optional.of(stationLookup.get(key));
 		}
 
 		return returned;
@@ -156,7 +175,7 @@ public class Whether {
 
 	private synchronized static void tickParsingStatus() {
 		filesProcessed++;
-		if ((filesProcessed % 5000) == 0) {
+		if ((filesProcessed % 40000) == 0) {
 			double percentDone = filesProcessed * 100.0 / numGsodFiles;
 
 			log.debug(((int) percentDone) + "% of GSOD files parsed, "

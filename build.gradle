@@ -11,7 +11,7 @@ version = '1.0'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 //fill this out and uncomment
-mainClassName = 'io.whether.Whether'
+mainClassName = 'io.whether.Processor'
 
 repositories {
     mavenCentral()

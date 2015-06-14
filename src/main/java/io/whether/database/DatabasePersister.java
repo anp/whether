@@ -78,6 +78,9 @@ public interface DatabasePersister {
 	@SqlUpdate("create index station_summary_index on daily_summaries (station_id,wban_id,summary_date)")
 	void createSummaryIndex();
 
+	@SqlUpdate("vacuum analyze")
+	void cleanUp();
+
 	@SqlUpdate("insert into stations " +
 			"(" +
 			"station_id, " +

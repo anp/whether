@@ -1,6 +1,6 @@
 package io.whether.parsing;
 
-import io.whether.Whether;
+import io.whether.Processor;
 import io.whether.domain.DailySummary;
 import io.whether.domain.PrecipitationReportsFlags;
 import io.whether.domain.Station;
@@ -23,10 +23,6 @@ public class GSODParser {
 
 	File gsodFile;
 	List<DailySummary> summaries;
-
-	Station previousStation;
-
-	boolean mismatchedIDsFound = false;
 
 	public GSODParser(File inFile) {
 		gsodFile = inFile;
@@ -62,15 +58,9 @@ public class GSODParser {
 		int stationNumber = Integer.parseInt(statNumStr);
 		int wbanNumber = Integer.parseInt(wbanStr);
 
-		Optional<Station> stationOptional = Whether.getStation(stationNumber, wbanNumber);
+		Optional<Station> stationOptional = Processor.getStation(stationNumber, wbanNumber);
 		if (stationOptional.isPresent()) {
-
-
 			station = stationOptional.get();
-			if (previousStation != null && !previousStation.equals(station)) {
-				log.warn("Station data changes mid-file!\n" + previousStation + "\n" + station);
-			}
-			previousStation = station;
 		} else {
 			log.trace("No station data found for station number " + stationNumber + ", wban number " + wbanNumber);
 			return null;
@@ -81,11 +71,6 @@ public class GSODParser {
 		String dateStr = line.substring(14, 22).trim();
 
 		LocalDate date = LocalDate.parse(dateStr, dateFormatter);
-
-		if ((stationNumber != station.getStationID() || wbanNumber != station.getWbanID()) && !mismatchedIDsFound) {
-			GSODParser.log.warn("STATION DATA MISMATCH: found station number " + stationNumber + "\t, found wban number " + wbanNumber + "\t in " + date + ", previously found station:\n\t" + station);
-			mismatchedIDsFound = true;
-		}
 
 		DailySummary summary = new DailySummary(station, date);
 

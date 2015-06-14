@@ -1,0 +1,7 @@
+#file::config.R
+#non-optional
+dbName <- 'whether'
+dbHost <- 'localhost'
+dbPort <- 5432
+dbUser <- 'postgres'
+dbPass <- 'some password'
