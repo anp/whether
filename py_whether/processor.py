@@ -2,163 +2,18 @@ __author__ = 'adam'
 
 import configparser
 import os
+import os.path
 from sys import argv
+import logging
 
-import psycopg2
+import postgresql
 
 import py_whether.db as db
+import py_whether.parsing as parsing
 
 
 
 
-
-
-
-
-
-
-# defining some constants for dict keys
-STATION_ID = 'station_id'
-WBAN_ID = 'wban_id'
-STATION_NAME = 'station_name'
-COUNTRY = 'country'
-STATE = 'state'
-LATITUDE = 'latitude'
-LONGITUDE = 'longitude'
-ELEVATION = 'elevation'
-
-# defining some functions for breaking functionality out
-def parse_stations(file):
-    stations = {}
-    found_data_start = False
-
-    line = file.readline()
-    while line != '':
-        line = file.readline()
-        if not found_data_start and line[:4] == 'USAF':
-            found_data_start = True
-            line = file.readline()
-            continue
-        elif not found_data_start:
-            continue
-
-        # break it apart
-        station_id_str = line[:7].strip()
-        wban_id_str = line[7:13].strip()
-        station_name = line[13:43].strip()
-        country = line[43:48].strip()
-        state = line[48:51].strip()
-        lat_str = line[51:59].strip()
-        lon_str = line[59:68].strip()
-        elev_str = line[68:76].strip()
-
-        # parse the relevant fields into integers, etc
-        try:
-            station_id = int(station_id_str)
-            wban_id = int(wban_id_str)
-        except ValueError:
-            continue
-
-        latitude = None
-        longitude = None
-        elevation = None
-        try:
-            if lat_str != '+00.000':
-                latitude = float(lat_str)
-            if lon_str != '+000.000':
-                longitude = float(lon_str)
-        except ValueError:
-            pass
-
-        try:
-            if elev_str != '-0999.0':
-                elevation = float(elev_str)
-        except ValueError:
-            pass
-
-        key = (station_id, wban_id)
-        this_station = {STATION_ID: station_id, WBAN_ID: wban_id, STATION_NAME: station_name, COUNTRY: country,
-                        STATE: state, LATITUDE: latitude, LONGITUDE: longitude, ELEVATION: elevation}
-
-        if key not in stations:
-            stations[key] = this_station
-        else:
-            old = stations[key]
-            stations[key] = merge_stations(old, this_station)
-
-    stations = filter_and_merge_stations_by_location(stations)
-    return stations
-
-
-def merge_stations(first, second):
-    station_id = first[STATION_ID]
-    wban_id = first[WBAN_ID]
-    station_name = first[STATION_NAME] if first[STATION_NAME] != '' else second[STATION_NAME]
-    country = first[COUNTRY] if first[COUNTRY] != '' else second[STATION_NAME]
-    state = first[STATE] if first[STATE] != '' else second[STATE]
-    latitude = first[LATITUDE] if first[LATITUDE] is not None else second[LATITUDE]
-    longitude = first[LONGITUDE] if first[LONGITUDE] is not None else second[LONGITUDE]
-    elevation = first[ELEVATION] if first[ELEVATION] is not None else second[ELEVATION]
-
-    new_station = {STATION_ID: station_id,
-                   WBAN_ID: wban_id,
-                   STATION_NAME: station_name,
-                   COUNTRY: country,
-                   STATE: state,
-                   LATITUDE: latitude,
-                   LONGITUDE: longitude,
-                   ELEVATION: elevation}
-    return new_station
-
-
-def filter_and_merge_stations_by_location(stations):
-    print("Number of stations initially: ", len(stations))
-    stations = sorted(list(stations.copy().values()),
-                      key=lambda station: station[LONGITUDE] if station[LONGITUDE] is not None else 200)
-    deduped_stations = {}
-    removed_stations = 0
-
-    while len(stations) > 0:
-        base_station = stations[0]
-        del stations[0]
-        key = (base_station[STATION_ID], base_station[WBAN_ID])
-
-        other_found = list()
-        for i in range(0, len(stations)):
-            other_station = stations[i]
-            if equal_latitude_longitude(base_station[LATITUDE], base_station[LONGITUDE],
-                                        other_station[LATITUDE], other_station[LONGITUDE]):
-                other_found.append(i)
-                base_station = merge_stations(base_station, other_station)
-            else:
-                if None in (base_station[LATITUDE], other_station[LATITUDE],
-                            base_station[LONGITUDE], other_station[LONGITUDE]):
-                    continue
-
-                elif abs(base_station[LATITUDE] - other_station[LATITUDE]) > 0.021 and abs(
-                                base_station[LONGITUDE] - other_station[LONGITUDE]) > 0.021:
-                    break
-
-        for i in sorted(other_found, reverse=True):
-            alt_key = (stations[i][STATION_ID], stations[i][WBAN_ID])
-            deduped_stations[alt_key] = base_station
-            del stations[i]
-            removed_stations += 1
-
-        deduped_stations[key] = base_station
-
-    print("Done removing stations!", removed_stations, "removed.")
-    return deduped_stations
-
-
-def equal_latitude_longitude(first_lat, first_lon, second_lat, second_lon):
-    if isinstance(first_lat, float) and isinstance(first_lon, float) and isinstance(second_lat, float) and isinstance(
-            second_lon, float):
-        lat_error = abs(first_lat - second_lat)
-        lon_error = abs(first_lon - second_lon)
-        return lat_error <= 0.02 and lon_error <= 0.02
-    else:
-        return False
 
 # read configuration
 config = configparser.ConfigParser()
@@ -177,41 +32,100 @@ pg_db = pg_conf['db']
 pg_user = pg_conf['user']
 
 pg_pass = pg_conf['pass']
+
+log_file = config['LOG']['log_file']
+
+# logger
+log = logging.getLogger('whether')
+log.setLevel(logging.DEBUG)
+
+fh = logging.FileHandler(log_file)
+fh.setLevel(logging.DEBUG)
+
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+
+formatter = logging.Formatter('%(asctime)s %(name)s^%(levelname)s: %(message)s')
+fh.setFormatter(formatter)
+ch.setFormatter(formatter)
+
+log.addHandler(fh)
+log.addHandler(ch)
+
+
+
+# start of main execution
+log.info("Starting whether parser...")
+
 # instantiate database connection
-conn = psycopg2.connect(database=pg_db, user=pg_user, password=pg_pass, host=pg_host, port=pg_port)
-cur = conn.cursor()
+# conn = psycopg2.connect(database=pg_db, user=pg_user, password=pg_pass, host=pg_host, port=pg_port)
+connection = postgresql.open(user=pg_user, password=pg_pass, host=pg_host, port=pg_port, database=pg_db,
+                             sslmode='allow')
+# schema_cur = conn.cursor()
+log.info("Connected to database!")
 
-print("Connected to database!")
 # init db schema
-db.create_schema(cur)
+# db.create_schema(schema_cur)
+# conn.commit()
+connection.execute(db.station_create_table_statement)
+connection.execute(db.summary_create_table_statement)
+log.info("Database schema initialized.")
 
-conn.commit()
 # find station inventory
-stations_file = open(gsod_root + os.sep + station_inventory)
-
 # parse station inventory
-stations_dict = parse_stations(stations_file)
-# close out reader
-# find duplicate stations by lat/lon
-# for each duplicate, merge it into the first one found and remove from station list
-# maintain list of duplicate id replacements
-# for each station, persist to database
+stations_dict = parsing.parse_stations(gsod_root + os.sep + station_inventory)
 
+log.info("Preparing and persisting stations to database.")
+# for each station, persist to database
+unique_stations = {s for s in stations_dict.values()}
+
+# station_cur = conn.cursor()
+# station_cur.prepare(db.station_insert_statement)
+station_statement = connection.prepare(db.station_insert_statement)
+station_statement.load_rows(unique_stations)
 
 # find the folder of unpacked GSOD files
+gsod_folder = gsod_root + os.sep + gsod_unzipped
 # find all files that end in .op
-# parse
-# skip the first line
-# for each line
-# split into relevant fields
-# parse into int/double/boolean as appropriate
-# persist
-# close out reader
+op_files = [gsod_folder + os.sep + f for f in os.listdir(gsod_folder) if f.endswith('.op')]
+log.info('Found %d summary files.', len(op_files))
 
-db.database_cleanup_and_index(cur)
-conn.commit()
+chunk_size = 4000
+op_chunks = [op_files[i:i + chunk_size] for i in range(0, len(op_files), chunk_size)]
+
+number_files_parsed = 0
+number_files_persisted = 0
+total_files = len(op_files)
+# commit_tolerance = 1000
+# summary_cur = conn.cursor()
+# summary_cur.prepare(db.summary_insert_statement)
+summary_statement = connection.prepare(db.summary_copy_statement)
+for chunk in op_chunks:
+    summaries = []
+
+    for file in chunk:
+        # parse and persist
+        summaries.extend(parsing.parse_summary(file, stations_dict))
+
+    number_files_parsed += chunk_size
+    log.info('%d/%d files parsed.', number_files_parsed, total_files)
+    summary_statement.load_rows(summaries)
+    number_files_persisted += chunk_size
+
+    # report on progress
+    log.info('%d/%d files persisted.', number_files_persisted, total_files)
+    break
+
+# summary_cur.close()
+
+log.info('All files parsed, cleaning up and adding indexes to database...')
+connection.execute(db.index_statement)
+connection.execute(db.analyze_statement)
+# db.database_cleanup_and_index(schema_cur)
+# conn.commit()
+log.info('All done!')
 
 # clean up, close out any unused resources
-cur.close()
-conn.close()
-print("Database connection closed!")
+connection.close()
+log.info("Database connection closed!")
+log.info("Exiting...\n\n")

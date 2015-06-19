@@ -12,7 +12,6 @@ setup(name="whether",
       url="http://github.com/dikaiosune/whether",
       packages=find_packages(),
       install_requires=[
-          "pandas>=0.16.2",
-          "psycopg2>=2.6"
+          "py-postgresql>=1.1.0"
       ],
       )
