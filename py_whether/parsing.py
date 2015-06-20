@@ -159,50 +159,50 @@ def parse_summary(file_path, stations):
             date = line[14:18] + '-' + line[18:20] + '-' + line[20:22]
 
             mean_temp_str = line[24:30]
-            mean_temp = float(mean_temp_str) if mean_temp_str != '9999.9' else None
-            mean_temp_obs = int(line[31:33])
+            mean_temp = mean_temp_str if mean_temp_str != '9999.9' else None
+            mean_temp_obs = line[31:33]
 
             dew_point_str = line[35:41]
-            dew_point = float(dew_point_str) if dew_point_str != '9999.9' else None
-            dew_point_obs = int(line[42:44])
+            dew_point = dew_point_str if dew_point_str != '9999.9' else None
+            dew_point_obs = line[42:44]
 
             sea_pressure_str = line[46:52]
-            sea_pressure = float(sea_pressure_str) if sea_pressure_str != '9999.9' else None
-            sea_pressure_obs = int(line[53:55])
+            sea_pressure = sea_pressure_str if sea_pressure_str != '9999.9' else None
+            sea_pressure_obs = line[53:55]
 
             station_pressure_str = line[57:63]
-            station_pressure = float(station_pressure_str) if station_pressure_str != '9999.9' else None
-            station_pressure_obs = int(line[64:66])
+            station_pressure = station_pressure_str if station_pressure_str != '9999.9' else None
+            station_pressure_obs = line[64:66]
 
             visibility_str = line[68:73]
-            visibility = float(visibility_str) if visibility_str != '999.9' else None
-            visibility_obs = int(line[74:76])
+            visibility = visibility_str if visibility_str != '999.9' else None
+            visibility_obs = line[74:76]
 
             mean_wind_spd_str = line[78:83]
-            mean_wind_spd = float(mean_wind_spd_str) if mean_wind_spd_str != '999.9' else None
-            mean_wind_spd_obs = int(line[84:86])
+            mean_wind_spd = mean_wind_spd_str if mean_wind_spd_str != '999.9' else None
+            mean_wind_spd_obs = line[84:86]
 
             max_wind_spd_str = line[88:93]
-            max_wind_spd = float(max_wind_spd_str) if max_wind_spd_str != '999.9' else None
+            max_wind_spd = max_wind_spd_str if max_wind_spd_str != '999.9' else None
 
             max_wind_gust_str = line[95:100]
-            max_wind_gust = float(max_wind_gust_str) if max_wind_gust_str != '999.9' else None
+            max_wind_gust = max_wind_gust_str if max_wind_gust_str != '999.9' else None
 
             max_temp_str = line[102:108]
-            max_temp = float(max_temp_str) if max_temp_str != '9999.9' else None
+            max_temp = max_temp_str if max_temp_str != '9999.9' else None
             max_temp_hourly = line[108] == '*'
 
             min_temp_str = line[110:116]
-            min_temp = float(min_temp_str) if min_temp_str != '9999.9' else None
+            min_temp = min_temp_str if min_temp_str != '9999.9' else None
             min_temp_hourly = line[116] == '*'
 
             precip_str = line[118:123]
             precip_flag = line[123]
-            precip = float(precip_str) if (
+            precip = precip_str if (
                 precip_str != '99.99' and precip_flag != 'H' and precip_flag != 'I') else None
 
             snow_depth_str = line[125:130]
-            snow_depth = float(snow_depth_str) if snow_depth_str != '999.9' else None
+            snow_depth = snow_depth_str if snow_depth_str != '999.9' else None
 
             fog = line[132] == '1'
             rain = line[133] == '1'
@@ -245,13 +245,6 @@ def parse_summary(file_path, stations):
             ]) + '\n'
             summary = summary.encode('utf-8')
 
-            """
-            summary = (station_id, wban_id, date, mean_temp, mean_temp_obs, dew_point, dew_point_obs, sea_pressure,
-                       sea_pressure_obs, station_pressure, station_pressure_obs, visibility, visibility_obs,
-                       mean_wind_spd, mean_wind_spd_obs, max_wind_spd, max_wind_gust, max_temp, max_temp_hourly,
-                       min_temp, min_temp_hourly, precip, precip_flag, snow_depth, fog, rain, snow, hail, thunder,
-                       tornado)
-            """
             summaries.append(summary)
 
         return summaries

@@ -47,7 +47,7 @@ summary_create_table_statement = """
 
         max_wind_speed_knots NUMERIC(4,1),
 
-        max_wing_gust_knots NUMERIC(4,1),
+        max_wind_gust_knots NUMERIC(4,1),
 
         precip_inches  NUMERIC(4,2),
         precip_report_flag CHARACTER(1),
@@ -81,12 +81,8 @@ station_insert_statement = """
     values ( $1, $2, $3, $4, $5, $6, $7, $8 )
     """
 
-summary_copy_statement = """
-copy daily_summaries from STDIN WITH (NULL 'None')
-"""
+summary_copy_statement = "copy daily_summaries from STDIN WITH (NULL 'None')"
 
-index_statement = """
-    CREATE INDEX station_summary_index ON daily_summaries (station_id,wban_id,summary_date)
-    """
+index_statement = 'CREATE INDEX station_summary_index ON daily_summaries (station_id,wban_id,summary_date)'
 
 analyze_statement = 'analyze'
