@@ -15,6 +15,7 @@ import py_whether.parsing as parsing
 
 
 
+
 # read configuration
 config = configparser.ConfigParser()
 
@@ -52,21 +53,15 @@ ch.setFormatter(formatter)
 log.addHandler(fh)
 log.addHandler(ch)
 
-
-
 # start of main execution
 log.info("Starting whether parser...")
 
 # instantiate database connection
-# conn = psycopg2.connect(database=pg_db, user=pg_user, password=pg_pass, host=pg_host, port=pg_port)
 connection = postgresql.open(user=pg_user, password=pg_pass, host=pg_host, port=pg_port, database=pg_db,
                              sslmode='allow')
-# schema_cur = conn.cursor()
 log.info("Connected to database!")
 
 # init db schema
-# db.create_schema(schema_cur)
-# conn.commit()
 connection.execute(db.station_create_table_statement)
 connection.execute(db.summary_create_table_statement)
 log.info("Database schema initialized.")
@@ -79,26 +74,22 @@ log.info("Preparing and persisting stations to database.")
 # for each station, persist to database
 unique_stations = {s for s in stations_dict.values()}
 
-# station_cur = conn.cursor()
-# station_cur.prepare(db.station_insert_statement)
 station_statement = connection.prepare(db.station_insert_statement)
 station_statement.load_rows(unique_stations)
 
 # find the folder of unpacked GSOD files
 gsod_folder = gsod_root + os.sep + gsod_unzipped
+
 # find all files that end in .op
 op_files = [gsod_folder + os.sep + f for f in os.listdir(gsod_folder) if f.endswith('.op')]
 log.info('Found %d summary files.', len(op_files))
 
-chunk_size = 4000
+chunk_size = 40000
 op_chunks = [op_files[i:i + chunk_size] for i in range(0, len(op_files), chunk_size)]
 
-number_files_parsed = 0
 number_files_persisted = 0
 total_files = len(op_files)
-# commit_tolerance = 1000
-# summary_cur = conn.cursor()
-# summary_cur.prepare(db.summary_insert_statement)
+
 summary_statement = connection.prepare(db.summary_copy_statement)
 for chunk in op_chunks:
     summaries = []
@@ -107,22 +98,18 @@ for chunk in op_chunks:
         # parse and persist
         summaries.extend(parsing.parse_summary(file, stations_dict))
 
-    number_files_parsed += chunk_size
-    log.info('%d/%d files parsed.', number_files_parsed, total_files)
     summary_statement.load_rows(summaries)
-    number_files_persisted += chunk_size
+    number_files_persisted += len(chunk)
 
     # report on progress
-    log.info('%d/%d files persisted.', number_files_persisted, total_files)
-    break
+    log.info('%d/%d files parsed and persisted.', number_files_persisted, total_files)
 
 # summary_cur.close()
 
 log.info('All files parsed, cleaning up and adding indexes to database...')
 connection.execute(db.index_statement)
 connection.execute(db.analyze_statement)
-# db.database_cleanup_and_index(schema_cur)
-# conn.commit()
+
 log.info('All done!')
 
 # clean up, close out any unused resources

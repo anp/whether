@@ -173,5 +173,6 @@ hs_err_pid*
 
 
 *.old
-config.R
-whether.ini
+*.png
+*.RData
+.Rhistory
