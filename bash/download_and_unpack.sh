@@ -19,6 +19,7 @@ mkdir -p /whether/unzipped
 
 echo "Unpacking each year's data..."
 cat /whether/tars/*.tar | tar --skip-old-files -xf - -i -C /whether/untarred
+rm -drf /whether/tars
 
 echo "Unzipping each station's data for each year..."
 cd /whether/untarred
@@ -29,4 +30,7 @@ do
 	if [ ! -f /whether/unzipped/$(basename "${GZIP_FILE}" .gz) ]; then
 		zcat $GZIP_FILE > /whether/unzipped/$(basename "${GZIP_FILE}" .gz)
 	fi
+	rm $GZIP_FILE
 done
+
+cd /

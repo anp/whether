@@ -1,7 +1,5 @@
+FROM ubuntu:14.10
 MAINTAINER Adam Perry (adam.n.perry@gmail.com)
-
-FROM ubuntu
-
 ### POSTGRES###
 
 # postgres section adapted from https://github.com/docker-library/postgres/blob/bfca9b8a92a99ccfc8f04933b7ecc29a108c7f49/9.4/Dockerfile
@@ -26,51 +24,68 @@ ENV LANG en_US.utf8
 ENV PG_MAJOR 9.4
 ENV PG_VERSION 9.4.4-1.pgdg70+1
 
-RUN apt-get install -y \
-	 postgresql-$PG_MAJOR=$PG_VERSION \
-	 postgresql-contrib-$PG_MAJOR=$PG_VERSION
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ utopic-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
+RUN apt-get update && \
+	apt-get install -y wget && \
+		wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | \
+      		sudo apt-key add -
+RUN sudo apt-get update
 
-RUN mkdir -p /var/run/postgresql && chown -R postgres /var/run/postgresql
+
+RUN apt-get install -y \
+	 postgresql-$PG_MAJOR \
+	 postgresql-contrib-$PG_MAJOR \
+	 libpq-dev
 
 ENV PATH /usr/lib/postgresql/$PG_MAJOR/bin:$PATH
 ENV PGDATA /var/lib/postgresql/data
-ENV PGPORT 5432
 ENV PGPASS "whether_password"
+ENV PGHOST localhost
+ENV PGPORT 5432
 
-VOLUME /var/lib/postgresql/data
+RUN mkdir -p /var/run/postgresql && chown -R postgres /var/run/postgresql
 
-RUN gosu echo "alter user  postgres with password $PGPASS;" | psql postgres
-RUN gosu postgres initdb
+VOLUME /var/lib/postgresql
+
+RUN chmod g+s /run/postgresql
+RUN chown -R postgres:postgres /run/postgresql
+
+EXPOSE 5432
 
 ### END POSTGRES ###
 
 ### PIP ###
 
 RUN apt-get install -y python3-pip
-RUN pip install py-postgresql
+RUN pip3 install py-postgresql
 
 ### END PIP ###
 
 ### R ###
 
-RUN apt-get install r-base
-COPY r_whether/dependencies.R /
+RUN apt-get -y install r-base
+RUN apt-get -y install libcurl4-gnutls-dev libxml2 libxml2-dev libssl-dev
+ADD r_whether/dependencies.R /
 RUN Rscript dependencies.R
 
 ### END R ###
 
 ### WHETHER ITSELF ###
 
+# VOLUME /whether
+
 RUN mkdir /py_whether
-COPY config/whether.ini /
-COPY py_whether/ /py_whether
+ADD config/whether.ini /
+ADD py_whether/ /py_whether
 
-COPY config/config.R /
-COPY r_whether/main.R /
-COPY r_whether/plotMeanTemp.R /
-COPY r_whether/plotTempStdDev.R /
-COPY r_whether/plotTornadoLocations.R /
+ADD config/config.R /
+ADD r_whether/main.R /
+ADD r_whether/plotMeanTemp.R /
+ADD r_whether/plotTempStdDev.R /
+ADD r_whether/plotTornadoLocations.R /
 
-COPY bash/whether.sh /
-COPY bash/download_and_unpack.sh /
-CMD ["whether.sh"]
+ADD bash/whether.sh /
+ADD bash/download_and_unpack.sh /
+RUN chmod +x whether.sh \
+	&& chmod +x download_and_unpack.sh
+CMD ["/whether.sh"]

@@ -8,11 +8,8 @@ import logging
 
 import postgresql
 
-import py_whether.db as db
-import py_whether.parsing as parsing
-
-
-
+import db
+import parsing
 
 
 
@@ -57,8 +54,7 @@ log.addHandler(ch)
 log.info("Starting whether parser...")
 
 # instantiate database connection
-connection = postgresql.open(user=pg_user, password=pg_pass, host=pg_host, port=pg_port, database=pg_db,
-                             sslmode='allow')
+connection = postgresql.open(user=pg_user, password=pg_pass, host=pg_host, port=pg_port, database=pg_db)
 log.info("Connected to database!")
 
 # init db schema
