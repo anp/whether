@@ -173,6 +173,5 @@ hs_err_pid*
 
 
 *.old
-*.png
 *.RData
 .Rhistory
